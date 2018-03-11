@@ -9,10 +9,9 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
-/**
- * Created by Michel on 28-2-2018.
- */
+import javax.persistence.TypedQuery;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class TweetDao {
@@ -39,6 +38,31 @@ public class TweetDao {
         }
 
         return tweet;
+    }
+
+    public Tweet getTweetById(String id) throws KwetterException {
+        try{
+            TypedQuery<Tweet> query = em.createQuery("SELECT t FROM Tweet t WHERE t.id = :id", Tweet.class);
+            return query.setParameter("id", id).getSingleResult();
+        } catch (Exception ex){
+            throw new KwetterException(id + " was not found!");
+        }
+    }
+
+    public Tweet updateTweet(Tweet tweet){
+        em.merge(tweet);
+        return tweet;
+    }
+
+    public List<Tweet> search(String keywords) throws KwetterException {
+        try{
+            TypedQuery<Tweet> query = em.createQuery("SELECT t FROM Tweet t WHERE t.text = :keywords", Tweet.class);
+            List<Tweet> tweets = query.setParameter("keywords", "%" + keywords + "%").getResultList();
+
+            return tweets;
+        } catch (Exception ex){
+            throw new KwetterException(keywords + " was not found!");
+        }
     }
 
 }

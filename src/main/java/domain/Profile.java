@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 @Entity
 public class Profile implements Serializable {
 
@@ -183,5 +180,33 @@ public class Profile implements Serializable {
 
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
+    }
+
+    public boolean followUser(Profile following){
+        if(!this.following.contains(following)){
+            return this.following.add(following);
+        }
+        return false;
+    }
+
+    public boolean beFollowed(Profile follower){
+        if(!this.followers.contains(follower)){
+            return this.followers.add(follower);
+        }
+        return false;
+    }
+
+    public boolean unfollowUser(Profile following){
+        if(this.following.contains(following)){
+            return this.following.remove(following);
+        }
+        return false;
+    }
+
+    public boolean beUnfollowed(Profile follower){
+        if(this.followers.contains(follower)){
+            return this.followers.remove(follower);
+        }
+        return false;
     }
 }

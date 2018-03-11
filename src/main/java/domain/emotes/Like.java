@@ -8,10 +8,6 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.io.Serializable;
-
-/**
- * Created by Michel on 28-2-2018.
- */
 @Entity
 @DiscriminatorValue("LIKE")
 public class Like extends Emote implements Serializable {

@@ -9,11 +9,8 @@ import service.ProfileService;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
-
-/**
- * Created by Michel on 28-2-2018.
- */
 
 @Path("profile")
 @Stateless
@@ -25,14 +22,14 @@ public class ProfileResource {
     @GET
     @Path("/search/username/{username}")
     @Produces(value = "application/json")
-    public String getProfileByUsername(@PathParam("username") String username){
-        try{
+    public String getProfileByUsername(@PathParam("username") String username) {
+        try {
             DataWrapper message = new DataWrapper(profileService.getProfileByUsername(username), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
-        } catch(KwetterException | JsonProcessingException ex){
-            try{
+        } catch (KwetterException | JsonProcessingException ex) {
+            try {
                 return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
-            } catch(JsonProcessingException exc){
+            } catch (JsonProcessingException exc) {
                 return "Something went really really really wrong.";
             }
         }
@@ -41,14 +38,14 @@ public class ProfileResource {
     @GET
     @Path("/search/id/{id}")
     @Produces(value = "application/json")
-    public String getProfileById(@PathParam("id") String id){
-        try{
+    public String getProfileById(@PathParam("id") String id) {
+        try {
             DataWrapper message = new DataWrapper(profileService.getProfileById(id), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
-        } catch(KwetterException | JsonProcessingException ex){
-            try{
+        } catch (KwetterException | JsonProcessingException ex) {
+            try {
                 return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
-            } catch(JsonProcessingException exc){
+            } catch (JsonProcessingException exc) {
                 return "Something went really really really wrong.";
             }
         }
@@ -61,8 +58,8 @@ public class ProfileResource {
     public String registerProfile(@FormParam("username") String username,
                                   @FormParam("password") String password,
                                   @FormParam("bio") String bio,
-                                  @FormParam("website") String website){
-        try{
+                                  @FormParam("website") String website) {
+        try {
             DataWrapper message = new DataWrapper(profileService.registerProfile(username, password, bio, website), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
         } catch (NoSuchAlgorithmException | JsonProcessingException | KwetterException ex) {
@@ -72,7 +69,93 @@ public class ProfileResource {
                 return "Something went horrebly wrong!";
             }
         }
+    }
 
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("/login")
+    @Produces(value = "application/json")
+    public String loginProfile(@FormParam("username") String username,
+                               @FormParam("password") String password) {
+        try {
+            DataWrapper message = new DataWrapper(profileService.login(username, password), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch (NoSuchAlgorithmException | JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException ex1) {
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("/follow")
+    @Produces(value = "application/json")
+    public String followProfile(@HeaderParam("token") String follower,
+                               @FormParam("following") String following) {
+        try {
+            DataWrapper message = new DataWrapper(profileService.followProfile(follower, following), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch (JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException ex1) {
+                return "Something went horrebly wrong!";
+            }
+        }
+
+    }
+
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("/unfollow")
+    @Produces(value = "application/json")
+    public String unfollowProfile(@HeaderParam("token") String follower,
+                                @FormParam("following") String following) {
+        try {
+            DataWrapper message = new DataWrapper(profileService.unfollowProfile(follower, following), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch (JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException ex1) {
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @GET
+    @Path("following/{id}")
+    @Produces(value="application/json")
+    public String profileFollowing(@PathParam("id") String id){
+        try{
+            DataWrapper message = new DataWrapper(profileService.profileFollowing(id), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch (JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException ex1) {
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @GET
+    @Path("followers/{id}")
+    @Produces(value="application/json")
+    public String profileFollowers(@PathParam("id") String id){
+        try{
+            DataWrapper message = new DataWrapper(profileService.profileFollowers(id), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch (JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException ex1) {
+                return "Something went horrebly wrong!";
+            }
+        }
     }
 
 }

@@ -6,9 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 public class HashUtil {
 
     public HashUtil(){}

@@ -11,10 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Michel on 28-2-2018.
- */
-
 @Entity
 public class Tweet implements Serializable{
 
@@ -26,6 +22,9 @@ public class Tweet implements Serializable{
 
     @Column
     private String text;
+
+    @Column
+    private boolean visable;
 
     @Temporal(TemporalType.DATE)
     private Date creationDate;
@@ -55,11 +54,25 @@ public class Tweet implements Serializable{
     public Tweet(String text, Date creationDate){
         this.id = UUID.randomUUID().toString();
         this.text = text;
+        this.visable = true;
         this.creationDate = creationDate;
         this.profile = null;
         this.emotes = new ArrayList<>();
         this.mentions = new ArrayList<>();
         this.tweets = new ArrayList<>();
+        this.hashTags = new ArrayList<>();
+    }
+
+    public Tweet(String text, Date creationDate, Tweet tweet){
+        this.id = UUID.randomUUID().toString();
+        this.text = text;
+        this.visable = true;
+        this.creationDate = creationDate;
+        this.profile = null;
+        this.emotes = new ArrayList<>();
+        this.mentions = new ArrayList<>();
+        this.tweets = new ArrayList<>();
+        this.tweets.add(tweet);
         this.hashTags = new ArrayList<>();
     }
 
@@ -78,6 +91,10 @@ public class Tweet implements Serializable{
     public void setText(String text) {
         this.text = text;
     }
+
+    public boolean getVisable() { return this.visable; }
+
+    public void setVisable(boolean visable) { this.visable = visable; }
 
     public Date getCreationDate() {
         return creationDate;

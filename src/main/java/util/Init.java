@@ -1,8 +1,7 @@
 package util;
 
-import dao.ProfileDao;
 import domain.KwetterException;
-import domain.Profile;
+import domain.ProfileType;
 import service.ProfileService;
 
 import javax.annotation.PostConstruct;
@@ -11,9 +10,6 @@ import javax.ejb.Startup;
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 @Startup
 @Singleton
 public class Init {
@@ -25,6 +21,7 @@ public class Init {
     public void init() {
         try {
             profileService.registerLimboProfile("Bassie", "kek1", "Ik ben bassie hoi", "bassie.com");
+            profileService.upgradeProfile("Bassie", ProfileType.ADMIN);
         } catch (KwetterException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

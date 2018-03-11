@@ -2,9 +2,6 @@ package domain;
 
 import java.io.Serializable;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 public class DataWrapper implements Serializable {
 
     private static final long serialVersionUID = 1L;

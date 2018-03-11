@@ -3,10 +3,6 @@ package domain;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * Created by Michel on 28-2-2018.
- */
-
 @Entity
 @Inheritance(strategy= InheritanceType.JOINED)
 @DiscriminatorColumn(name="EMOTE_TYPE")

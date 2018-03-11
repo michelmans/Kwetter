@@ -3,16 +3,15 @@ package service;
 import dao.ProfileDao;
 import domain.KwetterException;
 import domain.Profile;
+import domain.ProfileType;
 import util.HashUtil;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 @Stateless
 public class ProfileService {
 
@@ -42,7 +41,7 @@ public class ProfileService {
 
     public Profile registerProfile(String username, String password, String bio, String website) throws KwetterException, NoSuchAlgorithmException {
 
-        checkGivenInformation(username, password, bio, website);
+        checkArguments(new String[] {username, password, bio, website});
 
         HashUtil hashUtil = new HashUtil();
 
@@ -55,19 +54,76 @@ public class ProfileService {
         return profileDao.registerProfile(profile);
     }
 
+    public String login(String username, String password) throws KwetterException, NoSuchAlgorithmException{
+        checkArguments(new String[] {username, password});
+
+        Profile profile = profileDao.getProfileByUsername(username);
+
+
+        HashUtil hashUtil = new HashUtil();
+
+        if(!hashUtil.hashPassword(password, profile.getSalt(), "SHA-256","UTF-8")
+                .equals(profile.getHashedPassword())) throw new KwetterException("Username or password incorrect");
+
+        profile.setToken(hashUtil.generateSalt());
+        profileDao.updateProfile(profile);
+
+        return profile.getToken();
+    }
+
+    public Profile upgradeProfile(String username, ProfileType profileType) throws KwetterException {
+
+        Profile profile = profileDao.getProfileByUsername(username);
+        profile.setProfileType(profileType);
+
+        return profileDao.updateProfile(profile);
+    }
+
     public Profile getProfileByToken(String token) throws KwetterException{
         return profileDao.getProfileByToken(token);
     }
 
-    private void checkGivenInformation(String username, String website, String bio, String password) throws KwetterException {
-        if(username == null || username.trim().isEmpty())
-            throw new KwetterException("Invalid username");
-        if(website == null || website.trim().isEmpty())
-            throw new KwetterException("Invalid email");
-        if(bio == null || bio.trim().isEmpty())
-            throw new KwetterException("Invalid bio");
-        if(password == null || password.trim().isEmpty())
-            throw new KwetterException("Invalid password");
+    public Profile followProfile(String token, String followingId) throws KwetterException {
+        Profile profile = profileDao.getProfileByToken(token);
+        Profile following = profileDao.getProfileById(followingId);
+
+        profile.followUser(following);
+        following.beFollowed(profile);
+        profileDao.updateProfile(following);
+
+        return profileDao.updateProfile(profile);
+
+    }
+
+    public Profile unfollowProfile(String token, String unfollowingId) throws KwetterException {
+        Profile profile = profileDao.getProfileByToken(token);
+        Profile following = profileDao.getProfileById(unfollowingId);
+
+        profile.unfollowUser(following);
+        following.beUnfollowed(profile);
+
+        profileDao.updateProfile(following);
+        return profileDao.updateProfile(profile);
+    }
+
+    public List<Profile> profileFollowing(String id) throws KwetterException {
+        Profile profile = profileDao.getProfileById(id);
+
+        return profile.getFollowing();
+    }
+
+    public List<Profile> profileFollowers(String id) throws KwetterException {
+        Profile profile = profileDao.getProfileById(id);
+        return profile.getFollowers();
+    }
+
+    private void checkArguments(String... args) throws KwetterException {
+
+        for(String arg : args){
+            if(arg == null || arg.trim().isEmpty()){
+                throw new KwetterException("Argument not set");
+            }
+        }
     }
 
 }

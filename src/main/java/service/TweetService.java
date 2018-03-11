@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by Michel on 2-3-2018.
- */
 @Stateless
 public class TweetService {
 
@@ -39,6 +36,46 @@ public class TweetService {
         t.setMentions(mentionedProfile);
         t.setHashTags(mentionedHashtag);
         return tweetDao.postTweet(token, t);
+    }
+
+    public Tweet postTweetWithParent(String token, String tweet, String parent) throws KwetterException {
+
+        checkTweetLength(tweet);
+
+        List<Profile> mentionedProfile = convertMentions(tweet);
+        List<HashTag> mentionedHashtag = convertHashtag(tweet);
+
+        Tweet parentTweet = tweetDao.getTweetById(parent);
+        Tweet t = new Tweet(tweet, new Date(), parentTweet);
+        t.setMentions(mentionedProfile);
+        t.setHashTags(mentionedHashtag);
+        return tweetDao.postTweet(token, t);
+    }
+
+    public Tweet moderateTweet(String token, String id) throws KwetterException {
+        Profile profile = profileDao.getProfileByToken(token);
+        if(profile.getProfileType() != ProfileType.NORMAL) {
+            Tweet tweet = tweetDao.getTweetById(id);
+            tweet.setVisable(false);
+
+            return tweetDao.updateTweet(tweet);
+        }
+        throw new KwetterException("You are not allowed to moderate tweets");
+    }
+
+    public Tweet unmoderateTweet(String token, String id) throws KwetterException {
+        Profile profile = profileDao.getProfileByToken(token);
+        if(profile.getProfileType() != ProfileType.NORMAL) {
+            Tweet tweet = tweetDao.getTweetById(id);
+            tweet.setVisable(true);
+
+            return tweetDao.updateTweet(tweet);
+        }
+        throw new KwetterException("You are not allowed to unmoderate tweets");
+    }
+
+    public List<Tweet> search(String keywords) throws KwetterException {
+        return tweetDao.search(keywords);
     }
 
     private List<Profile> convertMentions(String tweet) throws KwetterException {

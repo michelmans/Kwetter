@@ -7,9 +7,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 @Entity
 public class HashTag implements Serializable {
 

@@ -8,11 +8,9 @@ import service.TweetService;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.ws.rs.*;
-
-/**
- * Created by Michel on 2-3-2018.
- */
 
 @Path("tweet")
 @Stateless
@@ -38,8 +36,79 @@ public class TweetResource {
                 return "Something went horrebly wrong!";
             }
         }
+    }
 
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("comment")
+    @Produces(value = "application/json")
+    public String postCommentOnTweet(@HeaderParam("token") String token,
+                                     @FormParam("tweet") String tweet,
+                                     @FormParam("parent") String parent){
 
+        try{
+            DataWrapper message = new DataWrapper(tweetService.postTweetWithParent(token, tweet, parent), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @GET
+    @Path("search/{keywords}")
+    @Produces(value = "application/json")
+    public String postCommentOnTweet(@PathParam("keywords") String keywords){
+
+        try{
+            DataWrapper message = new DataWrapper(tweetService.search(keywords), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("moderate")
+    @Produces(value = "application/json")
+    public String moderateTweet(@HeaderParam("token") String token,
+                              @FormParam("tweet") String tweet){
+        try{
+            DataWrapper message = new DataWrapper(tweetService.moderateTweet(token, tweet), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("unmoderate")
+    @Produces(value = "application/json")
+    public String unmoderateTweet(@HeaderParam("token") String token,
+                                @FormParam("tweet") String tweet){
+        try{
+            DataWrapper message = new DataWrapper(tweetService.unmoderateTweet(token, tweet), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
     }
 
 }

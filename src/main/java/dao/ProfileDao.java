@@ -8,9 +8,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-/**
- * Created by Michel on 28-2-2018.
- */
 @Stateless
 public class ProfileDao {
 

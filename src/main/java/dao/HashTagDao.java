@@ -8,9 +8,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 
-/**
- * Created by Michel on 5-3-2018.
- */
 @Stateless
 public class HashTagDao implements Serializable{
 
