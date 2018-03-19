@@ -25,6 +25,10 @@ public class TweetService {
     @Inject
     HashTagDao hashTagDao;
 
+    public Tweet getTweetById(String id) throws KwetterException{
+        return tweetDao.getTweetById(id);
+    }
+
     public Tweet postTweet(String token, String tweet) throws KwetterException {
 
         checkTweetLength(tweet);
@@ -38,25 +42,24 @@ public class TweetService {
         return tweetDao.postTweet(token, t);
     }
 
-    public Tweet postTweetWithParent(String token, String tweet, String parent) throws KwetterException {
+    public Tweet postComment(String token, String tweet, String parent) throws KwetterException {
 
         checkTweetLength(tweet);
 
         List<Profile> mentionedProfile = convertMentions(tweet);
         List<HashTag> mentionedHashtag = convertHashtag(tweet);
 
-        Tweet parentTweet = tweetDao.getTweetById(parent);
-        Tweet t = new Tweet(tweet, new Date(), parentTweet);
+        Tweet t = new Tweet(tweet, new Date());
         t.setMentions(mentionedProfile);
         t.setHashTags(mentionedHashtag);
-        return tweetDao.postTweet(token, t);
+        return tweetDao.postComment(token, t, parent);
     }
 
     public Tweet moderateTweet(String token, String id) throws KwetterException {
         Profile profile = profileDao.getProfileByToken(token);
         if(profile.getProfileType() != ProfileType.NORMAL) {
             Tweet tweet = tweetDao.getTweetById(id);
-            tweet.setVisable(false);
+            tweet.setVisible(false);
 
             return tweetDao.updateTweet(tweet);
         }
@@ -67,7 +70,7 @@ public class TweetService {
         Profile profile = profileDao.getProfileByToken(token);
         if(profile.getProfileType() != ProfileType.NORMAL) {
             Tweet tweet = tweetDao.getTweetById(id);
-            tweet.setVisable(true);
+            tweet.setVisible(true);
 
             return tweetDao.updateTweet(tweet);
         }

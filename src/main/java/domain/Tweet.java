@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,14 +16,13 @@ public class Tweet implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
 
     @Column
     private String text;
 
     @Column
-    private boolean visable;
+    private boolean visible;
 
     @Temporal(TemporalType.DATE)
     private Date creationDate;
@@ -33,7 +31,7 @@ public class Tweet implements Serializable{
     private Profile profile;
 
     @OneToMany
-    private List<Emote> emotes;
+    private List<Reaction> reactions;
 
     @ManyToMany
     private List<Profile> mentions;
@@ -54,25 +52,12 @@ public class Tweet implements Serializable{
     public Tweet(String text, Date creationDate){
         this.id = UUID.randomUUID().toString();
         this.text = text;
-        this.visable = true;
+        this.visible = true;
         this.creationDate = creationDate;
         this.profile = null;
-        this.emotes = new ArrayList<>();
+        this.reactions = new ArrayList<>();
         this.mentions = new ArrayList<>();
         this.tweets = new ArrayList<>();
-        this.hashTags = new ArrayList<>();
-    }
-
-    public Tweet(String text, Date creationDate, Tweet tweet){
-        this.id = UUID.randomUUID().toString();
-        this.text = text;
-        this.visable = true;
-        this.creationDate = creationDate;
-        this.profile = null;
-        this.emotes = new ArrayList<>();
-        this.mentions = new ArrayList<>();
-        this.tweets = new ArrayList<>();
-        this.tweets.add(tweet);
         this.hashTags = new ArrayList<>();
     }
 
@@ -92,9 +77,9 @@ public class Tweet implements Serializable{
         this.text = text;
     }
 
-    public boolean getVisable() { return this.visable; }
+    public boolean getVisible() { return this.visible; }
 
-    public void setVisable(boolean visable) { this.visable = visable; }
+    public void setVisible(boolean visible) { this.visible = visible; }
 
     public Date getCreationDate() {
         return creationDate;
@@ -112,12 +97,12 @@ public class Tweet implements Serializable{
         this.profile = profile;
     }
 
-    public List<Emote> getEmotes() {
-        return emotes;
+    public List<Reaction> getReactions() {
+        return reactions;
     }
 
-    public void setEmotes(List<Emote> emotes) {
-        this.emotes = emotes;
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
     }
 
     public List<Profile> getMentions() {

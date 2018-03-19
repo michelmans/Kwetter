@@ -36,7 +36,6 @@ public class Profile implements Serializable {
     @JsonIgnore
     private List<Profile> following;
 
-
     @ManyToMany(mappedBy="following")
     @JsonIgnore
     private List<Profile> followers;

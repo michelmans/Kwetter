@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.KwetterException;
 import domain.DataWrapper;
+import service.ReactionService;
 import service.TweetService;
 
 import javax.ejb.Stateless;
@@ -18,6 +19,27 @@ public class TweetResource {
 
     @Inject
     TweetService tweetService;
+
+    @Inject
+    ReactionService reactionService;
+
+    @GET
+    @Path("{id}")
+    @Produces(value = "application/json")
+    public String getTweetById(@PathParam("id") String id){
+
+        try{
+            DataWrapper message = new DataWrapper(tweetService.getTweetById(id), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
+
+    }
 
     @POST
     @Consumes(value = "application/x-www-form-urlencoded")
@@ -47,7 +69,27 @@ public class TweetResource {
                                      @FormParam("parent") String parent){
 
         try{
-            DataWrapper message = new DataWrapper(tweetService.postTweetWithParent(token, tweet, parent), DataWrapper.Status.SUCCESS);
+            DataWrapper message = new DataWrapper(tweetService.postComment(token, tweet, parent), DataWrapper.Status.SUCCESS);
+            return new ObjectMapper().writeValueAsString(message);
+        } catch ( JsonProcessingException | KwetterException ex) {
+            try {
+                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+            } catch (JsonProcessingException exc){
+                return "Something went horrebly wrong!";
+            }
+        }
+    }
+
+    @POST
+    @Consumes(value = "application/x-www-form-urlencoded")
+    @Path("react")
+    @Produces(value = "application/json")
+    public String reactOnTweet(@HeaderParam("token") String token,
+                                     @FormParam("reactionType") String reactionType,
+                                     @FormParam("tweet") String tweet){
+
+        try{
+            DataWrapper message = new DataWrapper(reactionService.addReaction(token, reactionType, tweet), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
         } catch ( JsonProcessingException | KwetterException ex) {
             try {

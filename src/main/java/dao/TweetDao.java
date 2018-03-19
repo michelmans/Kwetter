@@ -40,6 +40,30 @@ public class TweetDao {
         return tweet;
     }
 
+    public Tweet postComment(String token, Tweet tweet, String parentId) throws KwetterException {
+
+        Profile profile = profileDao.getProfileByToken(token);
+        Tweet parentTweet = getTweetById(parentId);
+
+        parentTweet.getTweets().add(tweet);
+        profile.getTweets().add(tweet);
+
+        tweet.setParent(parentTweet);
+        tweet.setProfile(profile);
+
+        em.persist(tweet);
+        em.merge(parentTweet);
+        profileDao.updateProfile(profile);
+
+        for(HashTag tag : tweet.getHashTags()){
+            tag.getTweets().add(tweet);
+            em.merge(tag);
+        }
+
+        return tweet;
+
+    }
+
     public Tweet getTweetById(String id) throws KwetterException {
         try{
             TypedQuery<Tweet> query = em.createQuery("SELECT t FROM Tweet t WHERE t.id = :id", Tweet.class);
