@@ -28,13 +28,16 @@ public class Profile implements Serializable {
     @Column
     private String hexColor;
 
-    @OneToMany
-    @JoinTable(name="FOLLOWING")
+    @ManyToMany
+    @JoinTable(
+            name="FOLLOWER",
+            joinColumns=@JoinColumn(name="PROFILE", referencedColumnName="id"),
+            inverseJoinColumns=@JoinColumn(name="FOLLOWING", referencedColumnName="id"))
     @JsonIgnore
     private List<Profile> following;
 
-    @OneToMany
-    @JoinTable(name="FOLLOWERS")
+
+    @ManyToMany(mappedBy="following")
     @JsonIgnore
     private List<Profile> followers;
 
