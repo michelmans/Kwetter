@@ -22,6 +22,14 @@ public class TweetDao {
     @Inject
     ProfileDao profileDao;
 
+    public List<Tweet> getAllTweets(){
+        return em.createQuery("SELECT t from Tweet t", Tweet.class).getResultList();
+    }
+
+    public List<Tweet> getAllVisibleTweets(){
+        return em.createQuery("SELECT t FROM Tweet t WHERE t.visible = '1'", Tweet.class).getResultList();
+    }
+
     public Tweet postTweet(String token, Tweet tweet) throws KwetterException {
 
         Profile profile = profileDao.getProfileByToken(token);

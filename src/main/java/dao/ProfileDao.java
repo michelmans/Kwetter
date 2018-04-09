@@ -7,6 +7,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 @Stateless
 public class ProfileDao {
@@ -39,6 +40,10 @@ public class ProfileDao {
         } catch (Exception ex){
             throw new KwetterException(token + " was not found");
         }
+    }
+
+    public List<Profile> getAllProfiles() {
+        return em.createQuery("SELECT p FROM Profile p", Profile.class).getResultList();
     }
 
     public Profile updateProfile(Profile profile){

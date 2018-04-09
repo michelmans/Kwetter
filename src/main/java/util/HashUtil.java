@@ -10,12 +10,10 @@ public class HashUtil {
 
     public HashUtil(){}
 
-    public String hashPassword(String password, String salt, String algorithm, String encoding){
+    public String hashPassword(String password, String algorithm, String encoding){
         try{
-            if(salt == null) return null;
 
             MessageDigest md = MessageDigest.getInstance(algorithm);
-            md.update(salt.getBytes(encoding));
             byte[] bytes = md.digest(password.getBytes(encoding));
 
             return String.format("%064x", new BigInteger(1, bytes));

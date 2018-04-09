@@ -1,4 +1,4 @@
-package boundary.rest;
+package rest.v1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,11 +9,9 @@ import service.TweetService;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.ws.rs.*;
 
-@Path("tweet")
+@Path("/v1/tweets")
 @Stateless
 public class TweetResource {
 
@@ -121,10 +119,9 @@ public class TweetResource {
     @Consumes(value = "application/x-www-form-urlencoded")
     @Path("moderate")
     @Produces(value = "application/json")
-    public String moderateTweet(@HeaderParam("token") String token,
-                              @FormParam("tweet") String tweet){
+    public String moderateTweet(@FormParam("tweet") String tweet){
         try{
-            DataWrapper message = new DataWrapper(tweetService.moderateTweet(token, tweet), DataWrapper.Status.SUCCESS);
+            DataWrapper message = new DataWrapper(tweetService.moderateTweet(tweet), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
         } catch ( JsonProcessingException | KwetterException ex) {
             try {
@@ -139,10 +136,9 @@ public class TweetResource {
     @Consumes(value = "application/x-www-form-urlencoded")
     @Path("unmoderate")
     @Produces(value = "application/json")
-    public String unmoderateTweet(@HeaderParam("token") String token,
-                                @FormParam("tweet") String tweet){
+    public String unmoderateTweet(@FormParam("tweet") String tweet){
         try{
-            DataWrapper message = new DataWrapper(tweetService.unmoderateTweet(token, tweet), DataWrapper.Status.SUCCESS);
+            DataWrapper message = new DataWrapper(tweetService.unmoderateTweet(tweet), DataWrapper.Status.SUCCESS);
             return new ObjectMapper().writeValueAsString(message);
         } catch ( JsonProcessingException | KwetterException ex) {
             try {

@@ -1,5 +1,6 @@
 package service;
 
+import dao.GroupDao;
 import dao.HashTagDao;
 import dao.ProfileDao;
 import dao.TweetDao;
@@ -25,8 +26,19 @@ public class TweetService {
     @Inject
     HashTagDao hashTagDao;
 
+    @Inject
+    GroupDao groupDao;
+
     public Tweet getTweetById(String id) throws KwetterException{
         return tweetDao.getTweetById(id);
+    }
+
+    public List<Tweet> getAllTweets() {
+        return tweetDao.getAllTweets();
+    }
+
+    public List<Tweet> getAllVisibleTweets(){
+        return tweetDao.getAllVisibleTweets();
     }
 
     public Tweet postTweet(String token, String tweet) throws KwetterException {
@@ -55,26 +67,18 @@ public class TweetService {
         return tweetDao.postComment(token, t, parent);
     }
 
-    public Tweet moderateTweet(String token, String id) throws KwetterException {
-        Profile profile = profileDao.getProfileByToken(token);
-        if(profile.getProfileType() != ProfileType.NORMAL) {
-            Tweet tweet = tweetDao.getTweetById(id);
-            tweet.setVisible(false);
+    public Tweet moderateTweet(String id) throws KwetterException {
+        Tweet tweet = tweetDao.getTweetById(id);
+        tweet.setVisible(false);
 
-            return tweetDao.updateTweet(tweet);
-        }
-        throw new KwetterException("You are not allowed to moderate tweets");
+        return tweetDao.updateTweet(tweet);
     }
 
-    public Tweet unmoderateTweet(String token, String id) throws KwetterException {
-        Profile profile = profileDao.getProfileByToken(token);
-        if(profile.getProfileType() != ProfileType.NORMAL) {
-            Tweet tweet = tweetDao.getTweetById(id);
-            tweet.setVisible(true);
+    public Tweet unmoderateTweet(String id) throws KwetterException {
+        Tweet tweet = tweetDao.getTweetById(id);
+        tweet.setVisible(true);
 
-            return tweetDao.updateTweet(tweet);
-        }
-        throw new KwetterException("You are not allowed to unmoderate tweets");
+        return tweetDao.updateTweet(tweet);
     }
 
     public List<Tweet> search(String keywords) throws KwetterException {

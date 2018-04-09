@@ -40,9 +40,8 @@ public class Profile implements Serializable {
     @JsonIgnore
     private List<Profile> followers;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private ProfileType profileType;
+    @ManyToMany(mappedBy = "profiles")
+    private List<Group> groups;
 
     @Column
     @JsonIgnore
@@ -51,10 +50,6 @@ public class Profile implements Serializable {
     @Column
     @JsonIgnore
     private String hashedPassword;
-
-    @Column
-    @JsonIgnore
-    private String salt;
 
     @ManyToMany(mappedBy = "mentions")
     @JsonIgnore
@@ -66,7 +61,7 @@ public class Profile implements Serializable {
 
     public Profile(){}
 
-    public Profile(String username, String website, String bio, String hashedPassword, String salt, String token){
+    public Profile(String username, String website, String bio, String hashedPassword, String token){
         this.id = UUID.randomUUID().toString();
         this.username = username;
         this.website = website;
@@ -74,9 +69,8 @@ public class Profile implements Serializable {
         this.hexColor = "#fff";
         this.following = new ArrayList<>();
         this.followers = new ArrayList<>();
-        this.profileType = ProfileType.NORMAL;
+        this.groups = new ArrayList<>();
         this.hashedPassword = hashedPassword;
-        this.salt = salt;
         this.token = token;
     }
 
@@ -136,12 +130,16 @@ public class Profile implements Serializable {
         this.followers = followers;
     }
 
-    public ProfileType getProfileType() {
-        return profileType;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public void addGroup(Group group){
+        this.groups.add(group);
     }
 
     public String getToken() {
@@ -158,14 +156,6 @@ public class Profile implements Serializable {
 
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public List<Tweet> getMentionedTweets() {
@@ -210,5 +200,36 @@ public class Profile implements Serializable {
             return this.followers.remove(follower);
         }
         return false;
+    }
+
+    public boolean isInGroup(String groupname){
+        for(Group group : groups){
+            if(group.getGroupName().equals(groupname))
+                return true;
+        }
+
+        return false;
+    }
+
+    public String additionalGroups(){
+        if(this.groups.size() == 0) return "no groups found";
+        String groupsString = "";
+        for(Group group : this.groups){
+            groupsString += group.getGroupName() + ", ";
+        }
+
+        if(groupsString.endsWith(", ")) groupsString = groupsString.substring(0, groupsString.length() - 2);
+
+        return groupsString;
+    }
+
+
+    public List<Tweet> getTweets(int maximum) {
+        if(tweets.size() < maximum) return this.tweets;
+
+        List<Tweet> found = new ArrayList<>();
+
+        for(int i = 0; i < maximum; i++) found.add(this.tweets.get(i));
+        return found;
     }
 }

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Facelet Title</title>
+</h:head>
+<h:body>]
+    Hello from coffee leuten
+    <br />
+
+    <h:form>
+        <p:outputLabel id="counter" value="#{coffee2GoController.count}" />
+
+        <br/>
+
+        <p:dataTable var="coffee" value="#{coffee2GoController.coffees}">
+            <p:column headerText="Id">
+                <h:outputText value="#{coffee.id}" />
+            </p:column>
+
+            <p:column headerText="brand">
+                <h:outputText value="#{coffee.brand}" />
+            </p:column>
+
+            <p:column headerText="roast">
+                <h:outputText value="#{coffee.roast}" />
+            </p:column>
+
+
+        </p:dataTable>
+
+
+        <p:commandButton value="Ajax Submit" id="ajax" update="counter" actionListener="#{coffee2GoController.buttonAction}" styleClass="ui-priority-primary" />
+
+    </h:form>
+</h:body>
+</html>
+

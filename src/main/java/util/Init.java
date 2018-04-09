@@ -1,7 +1,8 @@
 package util;
 
+import dao.GroupDao;
+import domain.Group;
 import domain.KwetterException;
-import domain.ProfileType;
 import service.ProfileService;
 
 import javax.annotation.PostConstruct;
@@ -17,11 +18,17 @@ public class Init {
     @Inject
     ProfileService profileService;
 
+    @Inject
+    GroupDao groupDao;
+
     @PostConstruct
     public void init() {
         try {
+            groupDao.addGroup(new Group("admins"));
+            groupDao.addGroup(new Group("members"));
+
             profileService.registerLimboProfile("Bassie", "kek1", "Ik ben bassie hoi", "bassie.com");
-            profileService.upgradeProfile("Bassie", ProfileType.ADMIN);
+            profileService.promoteProfile("Bassie");
         } catch (KwetterException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

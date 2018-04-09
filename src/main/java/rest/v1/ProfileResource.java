@@ -1,4 +1,4 @@
-package boundary.rest;
+package rest.v1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 
-@Path("profile")
+@Path("/v1/profiles")
 @Stateless
 public class ProfileResource {
 
@@ -20,33 +20,17 @@ public class ProfileResource {
     ProfileService profileService;
 
     @GET
-    @Path("/search/username/{username}")
+    @Path("{username}")
     @Produces(value = "application/json")
-    public String getProfileByUsername(@PathParam("username") String username) {
+    public Response getProfileByUsername(@PathParam("username") String username) {
         try {
             DataWrapper message = new DataWrapper(profileService.getProfileByUsername(username), DataWrapper.Status.SUCCESS);
-            return new ObjectMapper().writeValueAsString(message);
+            return Response.ok(new ObjectMapper().writeValueAsString(message)).build();
         } catch (KwetterException | JsonProcessingException ex) {
             try {
-                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
+                return Response.ok(new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR))).build();
             } catch (JsonProcessingException exc) {
-                return "Something went really really really wrong.";
-            }
-        }
-    }
-
-    @GET
-    @Path("/search/id/{id}")
-    @Produces(value = "application/json")
-    public String getProfileById(@PathParam("id") String id) {
-        try {
-            DataWrapper message = new DataWrapper(profileService.getProfileById(id), DataWrapper.Status.SUCCESS);
-            return new ObjectMapper().writeValueAsString(message);
-        } catch (KwetterException | JsonProcessingException ex) {
-            try {
-                return new ObjectMapper().writeValueAsString(new DataWrapper(ex.getMessage(), DataWrapper.Status.ERROR));
-            } catch (JsonProcessingException exc) {
-                return "Something went really really really wrong.";
+                return Response.serverError().build();
             }
         }
     }

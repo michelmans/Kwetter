@@ -1,22 +1,28 @@
 package service;
 
+import dao.GroupDao;
 import dao.ProfileDao;
+import domain.Group;
 import domain.KwetterException;
 import domain.Profile;
-import domain.ProfileType;
+import domain.Tweet;
 import util.HashUtil;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Stateless
 public class ProfileService {
 
     @Inject
     ProfileDao profileDao;
+
+    @Inject
+    GroupDao groupDao;
 
     public Profile getProfileByUsername(String username) throws KwetterException {
         return profileDao.getProfileByUsername(username);
@@ -26,15 +32,23 @@ public class ProfileService {
         return profileDao.getProfileById(id);
     }
 
+    public List<Profile> getAllProfiles() {
+        return profileDao.getAllProfiles();
+    }
+
     public Profile registerLimboProfile(String username, String password, String bio, String website) throws KwetterException, NoSuchAlgorithmException {
 
         HashUtil hashUtil = new HashUtil();
 
-        String salt = hashUtil.generateSalt();
-        String hashedPassword = hashUtil.hashPassword(password, salt, "SHA-256", "UTF-8");
+        String hashedPassword = hashUtil.hashPassword(password, "SHA-256", "UTF-8");
         String token = "TEMPTOKEN";
 
-        Profile profile = new Profile(username, website, bio, hashedPassword, salt, token);
+        Profile profile = new Profile(username, website, bio, hashedPassword, token);
+        Group group = groupDao.getGroupByName("members");
+
+        group.getProfiles().add(profile);
+        groupDao.update(group);
+        profile.getGroups().add(group);
 
         return profileDao.registerProfile(profile);
     }
@@ -45,11 +59,15 @@ public class ProfileService {
 
         HashUtil hashUtil = new HashUtil();
 
-        String salt = hashUtil.generateSalt();
-        String hashedPassword = hashUtil.hashPassword(password, salt, "SHA-256", "UTF-8");
+        String hashedPassword = hashUtil.hashPassword(password, "SHA-256", "UTF-8");
         String token = hashUtil.generateSalt();
 
-        Profile profile = new Profile(username, website, bio, hashedPassword, salt, token);
+        Profile profile = new Profile(username, website, bio, hashedPassword, token);
+        Group group = groupDao.getGroupByName("members");
+
+        group.getProfiles().add(profile);
+        groupDao.update(group);
+        profile.getGroups().add(group);
 
         return profileDao.registerProfile(profile);
     }
@@ -62,7 +80,7 @@ public class ProfileService {
 
         HashUtil hashUtil = new HashUtil();
 
-        if(!hashUtil.hashPassword(password, profile.getSalt(), "SHA-256","UTF-8")
+        if(!hashUtil.hashPassword(password, "SHA-256","UTF-8")
                 .equals(profile.getHashedPassword())) throw new KwetterException("Username or password incorrect");
 
         profile.setToken(hashUtil.generateSalt());
@@ -71,12 +89,41 @@ public class ProfileService {
         return profile.getToken();
     }
 
-    public Profile upgradeProfile(String username, ProfileType profileType) throws KwetterException {
+    public Profile promoteProfile(String username) throws KwetterException {
 
         Profile profile = profileDao.getProfileByUsername(username);
-        profile.setProfileType(profileType);
+        Group group = groupDao.getGroupByName("admins");
+
+        group.getProfiles().add(profile);
+        profile.getGroups().add(group);
+        groupDao.update(group);
 
         return profileDao.updateProfile(profile);
+    }
+
+    public Profile demoteProfile(String username) throws KwetterException {
+        Profile profile = profileDao.getProfileByUsername(username);
+        Group group = groupDao.getGroupByName("admins");
+
+        group.getProfiles().remove(profile);
+        profile.getGroups().remove(group);
+        groupDao.update(group);
+
+        return profileDao.updateProfile(profile);
+    }
+
+    public List<Tweet> getTimelineTweets(String token, int maximumTweets) throws KwetterException {
+        Profile profile = profileDao.getProfileByToken(token);
+        List<Tweet> tweets = new ArrayList<>();
+
+        tweets.addAll(profile.getTweets(maximumTweets));
+
+        for(Profile p : profile.getFollowing()){
+            tweets.addAll(p.getTweets(maximumTweets));
+        }
+
+        return tweets;
+
     }
 
     public Profile getProfileByToken(String token) throws KwetterException{
