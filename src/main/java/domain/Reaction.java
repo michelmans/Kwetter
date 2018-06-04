@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-public class Reaction implements Serializable{
+public class Reaction extends Base implements Serializable{
 
     private static final long serialVersionUID = 1L;
 

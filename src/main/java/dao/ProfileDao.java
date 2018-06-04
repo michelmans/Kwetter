@@ -38,7 +38,7 @@ public class ProfileDao {
             TypedQuery<Profile> query = em.createQuery("SELECT p FROM Profile p WHERE p.token = :token", Profile.class);
             return query.setParameter("token", token).getSingleResult();
         } catch (Exception ex){
-            throw new KwetterException(token + " was not found");
+            throw new KwetterException(token + " was not found!!!!!!!!!");
         }
     }
 

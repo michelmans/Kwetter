@@ -5,6 +5,8 @@ import dao.HashTagDao;
 import dao.ProfileDao;
 import dao.TweetDao;
 import domain.*;
+import socket.TimeLineEndPoint;
+import util.LinkBuilder;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -41,6 +43,27 @@ public class TweetService {
         return tweetDao.getAllVisibleTweets();
     }
 
+    public List<Tweet> getPersonalizedTweets(String id) throws KwetterException {
+        Profile profile = profileDao.getProfileById(id);
+        List<Tweet> tempListTweets = new ArrayList<>();
+
+        tempListTweets.addAll(profile.getTweets());
+
+        profile.getFollowing().forEach(item -> {
+            tempListTweets.addAll(item.getTweets());
+        });
+
+        return tempListTweets;
+    }
+
+    public List<Tweet> getProfileTweets(String id) throws KwetterException {
+        Profile profile = profileDao.getProfileById(id);
+        List<Tweet> tempListTweets = new ArrayList<>();
+        tempListTweets.addAll(profile.getTweets());
+
+        return tempListTweets;
+    }
+
     public Tweet postTweet(String token, String tweet) throws KwetterException {
 
         checkTweetLength(tweet);
@@ -51,7 +74,9 @@ public class TweetService {
         Tweet t = new Tweet(tweet, new Date());
         t.setMentions(mentionedProfile);
         t.setHashTags(mentionedHashtag);
-        return tweetDao.postTweet(token, t);
+        t = tweetDao.postTweet(token, t);
+        TimeLineEndPoint.sendToAllFollowers(LinkBuilder.generateTweetLinks(t));
+        return t;
     }
 
     public Tweet postComment(String token, String tweet, String parent) throws KwetterException {
@@ -64,7 +89,9 @@ public class TweetService {
         Tweet t = new Tweet(tweet, new Date());
         t.setMentions(mentionedProfile);
         t.setHashTags(mentionedHashtag);
-        return tweetDao.postComment(token, t, parent);
+        t = tweetDao.postComment(token, t, parent);
+        TimeLineEndPoint.sendToAllFollowers(LinkBuilder.generateTweetLinks(t));
+        return t;
     }
 
     public Tweet moderateTweet(String id) throws KwetterException {

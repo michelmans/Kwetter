@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class Profile implements Serializable {
+public class Profile extends Base implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

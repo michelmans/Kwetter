@@ -27,7 +27,8 @@ public class TweetDao {
     }
 
     public List<Tweet> getAllVisibleTweets(){
-        return em.createQuery("SELECT t FROM Tweet t WHERE t.visible = '1'", Tweet.class).getResultList();
+        //return em.createQuery("SELECT t FROM Tweet t WHERE t.visible = '1'", Tweet.class).getResultList();
+        return em.createQuery("SELECT t FROM Tweet t WHERE t.visible = '1' order by t.creationDate desc", Tweet.class).getResultList();
     }
 
     public Tweet postTweet(String token, Tweet tweet) throws KwetterException {

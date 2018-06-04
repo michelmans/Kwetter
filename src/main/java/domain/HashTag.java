@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class HashTag implements Serializable {
+public class HashTag extends Base implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

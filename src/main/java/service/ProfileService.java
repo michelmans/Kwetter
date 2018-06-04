@@ -8,7 +8,6 @@ import domain.Profile;
 import domain.Tweet;
 import util.HashUtil;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
@@ -53,7 +52,7 @@ public class ProfileService {
         return profileDao.registerProfile(profile);
     }
 
-    public Profile registerProfile(String username, String password, String bio, String website) throws KwetterException, NoSuchAlgorithmException {
+    public String registerProfile(String username, String password, String bio, String website) throws KwetterException, NoSuchAlgorithmException {
 
         checkArguments(new String[] {username, password, bio, website});
 
@@ -69,7 +68,7 @@ public class ProfileService {
         groupDao.update(group);
         profile.getGroups().add(group);
 
-        return profileDao.registerProfile(profile);
+        return profileDao.registerProfile(profile).getToken();
     }
 
     public String login(String username, String password) throws KwetterException, NoSuchAlgorithmException{
@@ -77,11 +76,10 @@ public class ProfileService {
 
         Profile profile = profileDao.getProfileByUsername(username);
 
-
         HashUtil hashUtil = new HashUtil();
 
         if(!hashUtil.hashPassword(password, "SHA-256","UTF-8")
-                .equals(profile.getHashedPassword())) throw new KwetterException("Username or password incorrect");
+                .equals(profile.getHashedPassword())) throw new KwetterException("Password is incorrect");
 
         profile.setToken(hashUtil.generateSalt());
         profileDao.updateProfile(profile);
